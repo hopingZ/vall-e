@@ -20,8 +20,8 @@ stop_stage=3
 # dl_dir=$PWD/download
 dl_dir=/data6/zhanghongbin/datasets/LibriTTS_part
 
-# dataset_parts="-p dev-clean -p test-clean"  # debug
-dataset_parts="all"  # all
+dataset_parts="dev-clean test-clean"  # debug
+# dataset_parts="all"  # all
 
 . shared/parse_options.sh || exit 1
 
