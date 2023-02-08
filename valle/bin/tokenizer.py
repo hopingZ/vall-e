@@ -107,7 +107,9 @@ def main():
     )
     assert len(manifests) == len(dataset_parts)
 
-    text_tokenizer = TextTokenizer()
+    text_tokenizer = TextTokenizer(
+        backend="festival"
+    )
 
     # Fix RuntimeError: Cowardly refusing to serialize non-leaf tensor...
     # by remove encodec weight_norm
