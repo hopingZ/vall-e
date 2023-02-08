@@ -23,7 +23,7 @@ from encodec import EncodecModel
 from encodec.utils import convert_audio
 from lhotse.features import FeatureExtractor
 from lhotse.utils import Seconds, compute_num_frames
-from phonemizer.backend import EspeakBackend
+from phonemizer.backend import EspeakBackend, FestivalBackend
 from phonemizer.backend.espeak.language_switch import LanguageSwitch
 from phonemizer.backend.espeak.words_mismatch import WordMismatch
 from phonemizer.punctuation import Punctuation
@@ -54,6 +54,12 @@ class TextTokenizer:
                 tie=tie,
                 language_switch=language_switch,
                 words_mismatch=words_mismatch,
+            )
+        elif backend == "festival":
+            phonemizer = FestivalBackend(
+                language,
+                punctuation_marks=punctuation_marks,
+                preserve_punctuation=preserve_punctuation,
             )
         else:
             raise NotImplementedError(f"{backend}")
