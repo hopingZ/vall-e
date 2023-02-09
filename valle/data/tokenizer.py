@@ -176,6 +176,9 @@ class AudioTokenExtractor(FeatureExtractor):
     ) -> np.ndarray:
         if not isinstance(samples, torch.Tensor):
             samples = torch.from_numpy(samples)
+            
+        duration = round(samples.shape[-1] / sampling_rate, ndigits=8)
+            
         if sampling_rate != self.config.tokenizer.sample_rate:
             samples = convert_audio(
                 samples,
@@ -194,12 +197,10 @@ class AudioTokenExtractor(FeatureExtractor):
         )
         codes = encoded_frames[0][0]  # [B, n_q, T]
         if True:
-            # duration = round(samples.shape[-1] / sampling_rate, ndigits=12)
-            duration = round(samples.shape[-1] / self.config.tokenizer.sample_rate, ndigits=12)
             expected_num_frames = compute_num_frames(
                 duration=duration,
                 frame_shift=self.frame_shift,
-                sampling_rate=self.config.tokenizer.sample_rate,  # sampling_rate,
+                sampling_rate=self.config.tokenizer.sample_rate,
             )
             assert abs(codes.shape[-1] - expected_num_frames) <= 1
             codes = codes[..., :expected_num_frames]
