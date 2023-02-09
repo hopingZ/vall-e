@@ -43,7 +43,7 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
   log "Stage 2: Tokenize aishell3"
   mkdir -p data/tokenized
   if [ ! -e data/tokenized/.aishell3.tokenize.done ]; then
-    python3 bin/tokenizer.py --dataset-parts "${dataset_parts}" \
+    python3 bin/tokenizer_for_aishell3.py \
         --src-dir "data/manifests" \
         --output-dir "data/tokenized"
   fi
@@ -53,32 +53,19 @@ fi
 if [ $stage -le 3 ] && [ $stop_stage -ge 3 ]; then
   log "Stage 3: Prepare aishell3 train/dev/test"
   if [ ! -e data/tokenized/.aishell3.train.done ]; then
-    if [ "${dataset_parts}" == "all" ];then
-      # train
-      lhotse combine \
-        data/tokenized/aishell3_cuts_train-clean-100.jsonl.gz \
-        data/tokenized/aishell3_cuts_train-clean-360.jsonl.gz \
-        data/tokenized/aishell3_cuts_train-other-500.jsonl.gz \
-        data/tokenized/cuts_train.jsonl.gz
+    # train
+    lhotse copy \
+      data/tokenized/aishell3_cuts_train.jsonl.gz \
+      data/tokenized/cuts_train.jsonl.gz
 
-      # dev
-      lhotse copy \
-        data/tokenized/aishell3_cuts_dev-clean.jsonl.gz \
-        data/tokenized/cuts_dev.jsonl.gz
-    else  # debug
-      # train
-      lhotse copy \
-        data/tokenized/aishell3_cuts_dev-clean.jsonl.gz \
-        data/tokenized/cuts_train.jsonl.gz
-      # dev
-      lhotse subset --first 400 \
-        data/tokenized/aishell3_cuts_test-clean.jsonl.gz \
-        data/tokenized/cuts_dev.jsonl.gz
-    fi
+    # dev
+    lhotse copy \
+      data/tokenized/aishell3_cuts_dev.jsonl.gz \
+      data/tokenized/cuts_dev.jsonl.gz
 
     # test
     lhotse copy \
-      data/tokenized/aishell3_cuts_test-clean.jsonl.gz \
+      data/tokenized/aishell3_cuts_test.jsonl.gz \
       data/tokenized/cuts_test.jsonl.gz
 
     touch data/tokenized/.aishell3.train.done

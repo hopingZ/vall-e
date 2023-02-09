@@ -63,12 +63,6 @@ def get_args():
         help="Path to the tokenized files",
     )
     parser.add_argument(
-        "--dataset-parts",
-        type=str,
-        default="dev-clean test-clean",
-        help="Space separated dataset parts",
-    )
-    parser.add_argument(
         "--prefix",
         type=str,
         default="libritts",
