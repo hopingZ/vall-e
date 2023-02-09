@@ -194,7 +194,8 @@ class AudioTokenExtractor(FeatureExtractor):
         )
         codes = encoded_frames[0][0]  # [B, n_q, T]
         if True:
-            duration = round(samples.shape[-1] / sampling_rate, ndigits=12)
+            # duration = round(samples.shape[-1] / sampling_rate, ndigits=12)
+            duration = round(samples.shape[-1] / self.config.tokenizer.sample_rate, ndigits=12)
             expected_num_frames = compute_num_frames(
                 duration=duration,
                 frame_shift=self.frame_shift,
