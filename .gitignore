@@ -7,6 +7,7 @@ exp*/
 log
 .DS_Store
 .vscode
-egs/*/data
+egs/libritts/data
+egs/aishell3_from_paddle/data
 valle/version.py
 infer/
