@@ -91,7 +91,9 @@ def get_args():
 @torch.no_grad()
 def main():
     args = get_args()
-    text_tokenizer = TextTokenizer()
+    text_tokenizer = TextTokenizer(
+        backend="festival"
+    )
     text_collater = get_text_token_collater(args.text_tokens)
     audio_tokenizer = AudioTokenizer()
 
