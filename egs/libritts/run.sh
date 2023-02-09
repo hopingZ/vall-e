@@ -63,7 +63,6 @@ if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
   fi
 fi
 
-
 if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
   log "Stage 2: Tokenize LibriTTS"
   mkdir -p data/tokenized
@@ -110,8 +109,6 @@ if [ $stage -le 3 ] && [ $stop_stage -ge 3 ]; then
   fi
 fi
 
-exit 0
-
 if [ $stage -le 4 ] && [ $stop_stage -ge 4 ]; then
   log "Stage 4: Train LibriTTS"
 
@@ -121,7 +118,7 @@ if [ $stage -le 4 ] && [ $stop_stage -ge 4 ]; then
     --exp-dir exp/valle_nano
 
   # same as paper
-  python3 bin/trainer.py \
-    --decoder-dim 1024 --nhead 16 --num-decoder-layers 12 \
-    --exp-dir exp/valle
+  # python3 bin/trainer.py \
+  #   --decoder-dim 1024 --nhead 16 --num-decoder-layers 12 \
+  #   --exp-dir exp/valle
 fi
