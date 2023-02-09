@@ -45,7 +45,8 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
   if [ ! -e data/tokenized/.aishell3.tokenize.done ]; then
     python3 bin/tokenizer_for_aishell3.py \
         --src-dir "data/manifests" \
-        --output-dir "data/tokenized"
+        --output-dir "data/tokenized" \
+        --prefix "aishell3"
   fi
   touch data/tokenized/.aishell3.tokenize.done
 fi
