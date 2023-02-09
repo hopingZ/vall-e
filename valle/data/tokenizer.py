@@ -198,7 +198,7 @@ class AudioTokenExtractor(FeatureExtractor):
             expected_num_frames = compute_num_frames(
                 duration=duration,
                 frame_shift=self.frame_shift,
-                sampling_rate=sampling_rate,
+                sampling_rate=self.config.tokenizer.sample_rate,  # sampling_rate,
             )
             assert abs(codes.shape[-1] - expected_num_frames) <= 1
             codes = codes[..., :expected_num_frames]
