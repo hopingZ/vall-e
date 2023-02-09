@@ -139,6 +139,7 @@ def main():
         )
 
         text_tokens = torch.concat([text_prompts[:, :-1], text_tokens[:, 1:]], dim=-1)
+        text_tokens = text_tokens.to(device)
         text_tokens_lens += text_prompts_lens - 2
 
         # synthesis
@@ -148,6 +149,7 @@ def main():
         samples = audio_tokenizer.decode(
             [(encoded_frames.transpose(2, 1), None)]
         )
+        samples = samples.cpu()
         # store
         torchaudio.save(f"{args.output_dir}/{n}.wav", samples[0], 24000)
 
