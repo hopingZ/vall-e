@@ -145,6 +145,7 @@ def tokenize_audio(tokenizer: AudioTokenizer, audio_path: str):
     wav, sr = torchaudio.load(audio_path)
     wav = convert_audio(wav, sr, tokenizer.sample_rate, tokenizer.channels)
     wav = wav.unsqueeze(0)
+    wav = wav.to(tokenizer.device)
 
     # Extract discrete codes from EnCodec
     with torch.no_grad():
