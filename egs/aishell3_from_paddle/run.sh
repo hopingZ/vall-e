@@ -45,7 +45,7 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
   log "Stage 2: Tokenize aishell3"
   mkdir -p data/tokenized
   if [ ! -e data/tokenized/.aishell3.tokenize.done ]; then
-    python3 bin/tokenizer_for_aishell3.py \
+    CUDA_VISIBLE_DEVICES=${gpus} python3 bin/tokenizer_for_aishell3.py \
         --src-dir "data/manifests" \
         --output-dir "data/tokenized" \
         --prefix "aishell3"
