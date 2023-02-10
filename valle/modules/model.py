@@ -611,6 +611,12 @@ def add_model_arguments(parser: argparse.ArgumentParser):
         default="VALL-E",
         help="VALL-E or VALL-F.",
     )
+    parser.add_argument(
+        "--max-num-phoneme-tokens",
+        type=int,
+        default=512,
+        help="Max number of unique phoneme tokens.",
+    )
 
 
 def get_model(params: AttributeDict) -> nn.Module:
