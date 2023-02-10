@@ -47,6 +47,7 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
         --src-dir "data/manifests" \
         --output-dir "data/tokenized" \
         --prefix "aishell3"
+    cp ${dump_dir}/phone_id_map.txt data/tokenized/unique_text_tokens.k2symbols
   fi
   touch data/tokenized/.aishell3.tokenize.done
 fi
