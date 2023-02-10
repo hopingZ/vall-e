@@ -131,7 +131,7 @@ def main():
 
             # Tokenize Text
             for c in tqdm(cut_set):
-                phonemes = '_'.join(c.supervisions[0].text)
+                phonemes = c.supervisions[0].text
                 c.supervisions[0].custom["tokens"] = {"text": phonemes}
 
             cuts_filename = f"{args.prefix}_cuts_{partition}.{args.suffix}"
