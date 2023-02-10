@@ -5,6 +5,8 @@ set -eou pipefail
 # fix segmentation fault reported in https://github.com/k2-fsa/icefall/issues/674
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
+gpus=0,1
+
 nj=16
 stage=-1
 stop_stage=3
@@ -78,7 +80,7 @@ if [ $stage -le 4 ] && [ $stop_stage -ge 4 ]; then
   log "Stage 4: Train aishell3"
 
   # nano
-  python3 bin/trainer.py \
+  CUDA_VISIBLE_DEVICES=${gpus} python3 bin/trainer.py \
     --decoder-dim 128 --nhead 4 --num-decoder-layers 4 \
     --exp-dir exp/valle_nano
 
