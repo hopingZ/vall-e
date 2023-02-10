@@ -23,7 +23,6 @@ from icefall.utils import AttributeDict, make_pad_mask
 
 from valle.modules.embedding import SinePositionalEmbedding, TokenEmbedding
 
-NUM_TEXT_TOKENS = 128
 NUM_AUDIO_TOKENS = 1024  # EnCodec RVQ bins
 
 
@@ -41,6 +40,7 @@ class VALLF(nn.Module):
         d_model: int,
         nhead: int,
         num_layers: int,
+        max_num_phoneme_tokens: int,
         decoder_cls: Union[
             nn.TransformerDecoder, nn.TransformerEncoder
         ] = nn.TransformerDecoder,
@@ -58,7 +58,7 @@ class VALLF(nn.Module):
             The number of sub-decoder-layers in the decoder (required).
         """
         super().__init__()
-        self.text_embedding = TokenEmbedding(d_model, NUM_TEXT_TOKENS)  # W_x
+        self.text_embedding = TokenEmbedding(d_model, max_num_phoneme_tokens)  # W_x
         self.text_position = SinePositionalEmbedding(d_model)
 
         self.audio_embeddings = nn.ModuleList(
@@ -327,6 +327,7 @@ class VALLE(VALLF):
         d_model: int,
         nhead: int,
         num_layers: int,
+        max_num_phoneme_tokens: int
     ):
         """
         Args:
@@ -341,6 +342,7 @@ class VALLE(VALLF):
             d_model,
             nhead,
             num_layers,
+            max_num_phoneme_tokens,
             decoder_cls=nn.TransformerEncoder,
             decoder_layer_cls=nn.TransformerEncoderLayer,
         )
@@ -614,12 +616,12 @@ def add_model_arguments(parser: argparse.ArgumentParser):
 def get_model(params: AttributeDict) -> nn.Module:
     if params.model_name.lower() in ["vall-f", "vallf"]:
         model = VALLF(
-            params.decoder_dim, params.nhead, params.num_decoder_layers
+            params.decoder_dim, params.nhead, params.num_decoder_layers, params.max_num_phoneme_tokens
         )
     else:
         assert params.model_name.lower() in ["vall-e", "valle"]
         model = VALLE(
-            params.decoder_dim, params.nhead, params.num_decoder_layers
+            params.decoder_dim, params.nhead, params.num_decoder_layers, params.max_num_phoneme_tokens
         )
 
     return model
