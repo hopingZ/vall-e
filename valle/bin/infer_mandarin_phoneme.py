@@ -55,10 +55,10 @@ def get_args():
     )
 
     parser.add_argument(
-        "--texts",
+        "--text",
         type=str,
         default="",
-        help="Texts to be synthesized. Divided by '|' if have multi sentenses to generate.",
+        help="Text to be synthesized. Divided by '|' if have multi sentenses to generate.",
     )
 
     # model
