@@ -651,7 +651,6 @@ def get_model(params: AttributeDict) -> nn.Module:
             params.nhead, 
             params.num_decoder_layers, 
             params.max_num_phoneme_tokens, 
-            params.max_num_phoneme_tokens,
             params.training_start_frame
         )
 
