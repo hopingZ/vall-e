@@ -327,7 +327,8 @@ class VALLE(VALLF):
         d_model: int,
         nhead: int,
         num_layers: int,
-        max_num_phoneme_tokens: int
+        max_num_phoneme_tokens: int,
+        training_start_frame: int = 0
     ):
         """
         Args:
@@ -346,6 +347,7 @@ class VALLE(VALLF):
             decoder_cls=nn.TransformerEncoder,
             decoder_layer_cls=nn.TransformerEncoderLayer,
         )
+        self.training_start_frame = training_start_frame
 
     def forward(
         self,
@@ -426,11 +428,16 @@ class VALLE(VALLF):
             src_key_padding_mask=xy_padding_mask,
             # is_causal=True,
         )
-        logits = self.predict_layers[0](xy_dec[:, x_len:])
-        logits = logits.reshape([-1, NUM_AUDIO_TOKENS + 1])
+        logits = self.predict_layers[0](xy_dec[:, x_len:]).permute(0, 2, 1)
+        
+        logits = logits[:, :, self.training_start_frame:]
+        targets = targets[:, self.training_start_frame:]
+        
         # loss
         total_loss = F.cross_entropy(
-            logits, targets.reshape([-1]), reduction="sum"
+            logits, 
+            targets, 
+            reduction="sum"
         )
         # samples = [
         #     torch.multinomial(F.softmax(logits, dim=1), num_samples=1)
@@ -453,12 +460,16 @@ class VALLE(VALLF):
                 src_key_padding_mask=xy_padding_mask,
                 # is_causal=False,
             )
-            logits = predict_layer(xy_dec[:, x_len:])
+            logits = predict_layer(xy_dec[:, x_len:]).permute(0, 2, 1)
 
             # loss
             targets = codes[..., i + 1] + NUM_AUDIO_TOKENS * y_mask_int
+            
+            logits = logits[:, :, self.training_start_frame:]
+            targets = targets[:, self.training_start_frame:]
+            
             total_loss += F.cross_entropy(
-                logits.permute(0, 2, 1),
+                logits,
                 targets,
                 ignore_index=NUM_AUDIO_TOKENS,
                 reduction="sum",
@@ -617,17 +628,31 @@ def add_model_arguments(parser: argparse.ArgumentParser):
         default=512,
         help="Max number of unique phoneme tokens.",
     )
+    parser.add_argument(
+        "--training-start-frame",
+        type=int,
+        default=0,
+        help="Frames before this frame won't be calculated loss.",
+    )
 
 
 def get_model(params: AttributeDict) -> nn.Module:
     if params.model_name.lower() in ["vall-f", "vallf"]:
         model = VALLF(
-            params.decoder_dim, params.nhead, params.num_decoder_layers, params.max_num_phoneme_tokens
+            params.decoder_dim, 
+            params.nhead, 
+            params.num_decoder_layers, 
+            params.max_num_phoneme_tokens
         )
     else:
         assert params.model_name.lower() in ["vall-e", "valle"]
         model = VALLE(
-            params.decoder_dim, params.nhead, params.num_decoder_layers, params.max_num_phoneme_tokens
+            params.decoder_dim, 
+            params.nhead, 
+            params.num_decoder_layers, 
+            params.max_num_phoneme_tokens, 
+            params.max_num_phoneme_tokens,
+            params.training_start_frame
         )
 
     return model
