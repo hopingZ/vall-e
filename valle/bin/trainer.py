@@ -126,13 +126,6 @@ def get_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
-        "--max-num-phoneme-tokens",
-        type=int,
-        default=512,
-        help="Max number of unique phoneme tokens.",
-    )
-
-    parser.add_argument(
         "--world-size",
         type=int,
         default=1,
