@@ -658,20 +658,20 @@ def add_model_arguments(parser: argparse.ArgumentParser):
 def get_model(params: AttributeDict) -> nn.Module:
     if params.model_name.lower() in ["vall-f", "vallf"]:
         model = VALLF(
-            params.decoder_dim, 
-            params.nhead, 
-            params.num_decoder_layers, 
-            params.max_num_phoneme_tokens, 
-            params.training_start_frame
+            d_model=params.decoder_dim, 
+            nhead=params.nhead, 
+            num_layers=params.num_decoder_layers, 
+            max_num_phoneme_tokens=params.max_num_phoneme_tokens, 
+            training_start_frame=params.training_start_frame
         )
     else:
         assert params.model_name.lower() in ["vall-e", "valle"]
         model = VALLE(
-            params.decoder_dim, 
-            params.nhead, 
-            params.num_decoder_layers, 
-            params.max_num_phoneme_tokens, 
-            params.training_start_frame
+            d_model=params.decoder_dim, 
+            nhead=params.nhead, 
+            num_layers=params.num_decoder_layers, 
+            max_num_phoneme_tokens=params.max_num_phoneme_tokens, 
+            training_start_frame=params.training_start_frame
         )
 
     return model
