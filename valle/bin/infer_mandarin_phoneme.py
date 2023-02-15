@@ -113,25 +113,29 @@ def main():
     encoded_frames = tokenize_audio(audio_tokenizer, args.audio_prompt)
     audio_prompt = encoded_frames[0][0]
     audio_prompts = torch.concat([audio_prompt], dim=-1).transpose(2, 1)
+    print("audio_prompt\n", audio_prompts, audio_prompts.shape)
 
     for n, text in enumerate(args.text.split("|")):
         logging.info(f"synthesize text: {text}")
         text_tokens, text_tokens_lens = text_collater([text.split(' ')])
-
+        print("text_prompt\n", text_prompt)
+        print("text_generating\n", text_tokens)
         text_tokens = torch.concat([text_prompt[:, :-1], text_tokens[:, 1:]], dim=-1)
+        print("text_concat\n", text_tokens)
         text_tokens = text_tokens.to(device)
         text_tokens_lens += text_prompts_lens - 2
 
         # synthesis
         encoded_frames = model.inference(
-            text_tokens.to(device), text_tokens_lens.to(device), audio_prompts.to(device)
+            text_tokens, text_tokens_lens, audio_prompts
         )
+        print(encoded_frames)
         samples = audio_tokenizer.decode(
             [(encoded_frames.transpose(2, 1), None)]
         )
         samples = samples.cpu()
         # store
-        torchaudio.save(f"{args.output_dir}/{n}.wav", samples[0].cpu(), 24000)
+        torchaudio.save(f"{args.output_dir}/{n}.wav", samples[0], 24000)
 
 
 torch.set_num_threads(1)
