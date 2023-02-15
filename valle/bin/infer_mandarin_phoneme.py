@@ -84,6 +84,13 @@ def get_args():
         default=Path("infer/demo"),
         help="Path to the tokenized files.",
     )
+    
+    parser.add_argument(
+        "--num-last-ignoring-frames",
+        type=int,
+        default=0,
+        help="The number of ignoring frames at the end of given audio prompt.",
+    )
 
     return parser.parse_args()
 
@@ -113,6 +120,8 @@ def main():
     encoded_frames = tokenize_audio(audio_tokenizer, args.audio_prompt)
     audio_prompt = encoded_frames[0][0]
     audio_prompts = torch.concat([audio_prompt], dim=-1).transpose(2, 1)
+    if args.num_last_ignoring_frames > 0:
+        audio_prompts = audio_prompts[:, :-args.num_last_ignoring_frames, :]
     print("audio_prompt\n", audio_prompts, audio_prompts.shape)
 
     for n, text in enumerate(args.text.split("|")):
