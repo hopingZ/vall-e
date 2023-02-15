@@ -204,7 +204,7 @@ class VALLF(nn.Module):
         )[0]
         # Non-AR Decoders
         nar_decoder_block = self.decoder_blocks[1]
-        for i, in range(7):
+        for i in range(7):
             predict_layer = self.predict_layers[i + 1]
             y_dec, _ = nar_decoder_block(
                 (y_pos, self.stage_embeddings.embedding(i + 1)),
@@ -309,13 +309,8 @@ class VALLF(nn.Module):
         codes = [y[:, prompts_len:]]
         # Non-AR Decoders
         nar_decoder_block = self.decoder_blocks[1]
-        for i, (predict_layer, embedding_layer) in enumerate(
-            zip(
-                self.decoder_blocks[1:],
-                self.predict_layers[1:],
-                self.audio_embeddings[1:] + [None],
-            )
-        ):
+        for i in range(7):
+            predict_layer = self.predict_layers[i + 1]
             y_dec, _ = nar_decoder_block(
                 (y_pos, self.stage_embeddings.embedding(i + 1)),
                 x,
@@ -329,8 +324,8 @@ class VALLF(nn.Module):
             codes.append(samples)
             # Formula (4) (5)
             if i < 6:
-                y_pos[:, :prompts_len] += embedding_layer(prompts[..., i + 1])
-                y_pos[:, prompts_len:] += embedding_layer(samples)
+                y_pos[:, :prompts_len] += self.audio_embeddings[i + 1](prompts[..., i + 1])
+                y_pos[:, prompts_len:] += self.audio_embeddings[i + 1](samples)
 
         assert len(codes) == 8
         return torch.stack(codes, dim=-1)
