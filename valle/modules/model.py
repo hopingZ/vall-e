@@ -69,7 +69,7 @@ class VALLF(nn.Module):
 
         self.audio_embeddings = nn.ModuleList(
             [TokenEmbedding(d_model, NUM_AUDIO_TOKENS + 1)]
-            + [TokenEmbedding(d_model, NUM_AUDIO_TOKENS) for i in range(6)]
+            + [TokenEmbedding(d_model, NUM_AUDIO_TOKENS) for _ in range(6)]
         )  # W_a
         self.audio_position = SinePositionalEmbedding(d_model)
         
@@ -96,21 +96,23 @@ class VALLF(nn.Module):
                     num_layers=num_layers,
                     norm=final_norm,
                 )
-                for i in range(2)
+                for _ in range(2)
             ]
         )
 
         self.predict_layers = nn.ModuleList(
             [nn.Linear(d_model, NUM_AUDIO_TOKENS + 1)]
-            + [nn.Linear(d_model, NUM_AUDIO_TOKENS) for i in range(7)]
+            + [nn.Linear(d_model, NUM_AUDIO_TOKENS) for _ in range(7)]
         )
 
         # We share the parameters of the output projection layer with the parameters of the acoustic embedding Wa
         self.predict_layers[0].weight = self.audio_embeddings[0].weight
+        assert self.predict_layers[0].weight is self.audio_embeddings[0].weight
         # We also share the parameters of the acoustic embedding layer and the output prediction layer,
         # which means the weights of the j-th prediction layer are the same as the (j + 1)-th acoustic embedding layer.
-        for j in range(1, 6):
-            self.predict_layers[j].weight = self.audio_embeddings[j + 1].weight
+        for j in range(1, 7):
+            self.predict_layers[j].weight = self.audio_embeddings[j].weight
+            assert self.predict_layers[j].weight is self.audio_embeddings[j].weight
 
         self.rng = random.Random(0)
         
@@ -202,12 +204,8 @@ class VALLF(nn.Module):
         )[0]
         # Non-AR Decoders
         nar_decoder_block = self.decoder_blocks[1]
-        for i, (predict_layer, embedding_layer) in enumerate(
-            zip(
-                self.predict_layers[1:],
-                self.audio_embeddings[1:] + [None],
-            )
-        ):
+        for i, in range(7):
+            predict_layer = self.predict_layers[i + 1]
             y_dec, _ = nar_decoder_block(
                 (y_pos, self.stage_embeddings.embedding(i + 1)),
                 x,
@@ -238,7 +236,7 @@ class VALLF(nn.Module):
             #     torch.multinomial(F.softmax(logits.reshape([-1, NUM_AUDIO_TOKENS]), dim=1), num_samples=1)
             # )
             # Formula (4) (5)
-            y_pos = y_pos + embedding_layer(codes[..., i + 1])
+            y_pos = y_pos + self.audio_embeddings[i + 1](codes[..., i + 1])
 
         return (codes, total_loss / (stop_idx + 1.0))
 
@@ -663,7 +661,8 @@ def get_model(params: AttributeDict) -> nn.Module:
             params.decoder_dim, 
             params.nhead, 
             params.num_decoder_layers, 
-            params.max_num_phoneme_tokens
+            params.max_num_phoneme_tokens, 
+            params.training_start_frame
         )
     else:
         assert params.model_name.lower() in ["vall-e", "valle"]
