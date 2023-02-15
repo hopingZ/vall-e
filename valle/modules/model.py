@@ -52,6 +52,7 @@ class VALLF(nn.Module):
         decoder_layer_cls: Union[
             TransformerDecoderLayer, TransformerEncoderLayer
         ] = TransformerDecoderLayer,
+        training_start_frame: int = 0
     ):
         """
         Args:
@@ -112,6 +113,8 @@ class VALLF(nn.Module):
             self.predict_layers[j].weight = self.audio_embeddings[j + 1].weight
 
         self.rng = random.Random(0)
+        
+        self.training_start_frame = training_start_frame
 
     def forward(
         self,
@@ -181,11 +184,14 @@ class VALLF(nn.Module):
             memory_mask=None,
             memory_key_padding_mask=x_mask,
         )
-        logits = self.predict_layers[0](y_dec)
-        logits = logits.reshape([-1, NUM_AUDIO_TOKENS + 1])
+        logits = self.predict_layers[0](y_dec).permute(0, 2, 1)        
+        
+        logits = logits[:, :, self.training_start_frame:]
+        targets = targets[:, self.training_start_frame:]
+        
         # loss
         total_loss = F.cross_entropy(
-            logits, targets.reshape([-1]), reduction="sum"
+            logits, targets, reduction="sum"
         )
         # samples = [
         #     torch.multinomial(F.softmax(logits, dim=1), num_samples=1)
@@ -210,12 +216,16 @@ class VALLF(nn.Module):
                 memory_mask=None,
                 memory_key_padding_mask=x_mask,
             )
-            logits = predict_layer(y_dec)
+            logits = predict_layer(y_dec).permute(0, 2, 1)
 
             # loss
             targets = codes[..., i + 1] + NUM_AUDIO_TOKENS * y_mask_int
+
+            logits = logits[:, :, self.training_start_frame:]
+            targets = targets[:, self.training_start_frame:]
+
             total_loss += F.cross_entropy(
-                logits.permute(0, 2, 1),
+                logits,
                 targets,
                 ignore_index=NUM_AUDIO_TOKENS,
                 reduction="sum",
@@ -357,8 +367,8 @@ class VALLE(VALLF):
             max_num_phoneme_tokens,
             decoder_cls=nn.TransformerEncoder,
             decoder_layer_cls=TransformerEncoderLayer,
+            training_start_frame=training_start_frame
         )
-        self.training_start_frame = training_start_frame
 
     def forward(
         self,
