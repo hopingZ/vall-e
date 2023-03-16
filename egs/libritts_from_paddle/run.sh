@@ -11,7 +11,7 @@ nj=16
 stage=-1
 stop_stage=3
 
-dl_dir=/data6/zhanghongbin/datasets/LibriTTS
+dl_dir=/data6/zhanghongbin/datasets/LibriTTS/LibriTTS
 dump_dir=/data6/zhanghongbin/projects/PaddleSpeech/examples/libritts/tts1/dump
 
 . shared/parse_options.sh || exit 1
