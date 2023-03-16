@@ -40,7 +40,7 @@ def main():
         for raw_metadata_i in raw_metadata:
             dir_1, dir_2, _, _ = raw_metadata_i["utt_id"].split('_')
             wav_file_paths_of_cur_part.append(
-                Path(dl_dir).glob("*/%s/%s" % (dir_1, dir_2))[0] / (raw_metadata_i["utt_id"] + ".wav")
+                Path(dl_dir).glob("*/%s/%s" % (dir_1, dir_2)).__next__() / (raw_metadata_i["utt_id"] + ".wav")
             )
 
         file_read_worker = partial(
