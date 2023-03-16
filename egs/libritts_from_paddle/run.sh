@@ -12,7 +12,7 @@ stage=-1
 stop_stage=3
 
 dl_dir=/data6/zhanghongbin/datasets/LibriTTS
-dump_dir=/data6/zhanghongbin/projects/PaddleSpeech/examples/libritts/tts1/dump/train/norm
+dump_dir=/data6/zhanghongbin/projects/PaddleSpeech/examples/libritts/tts1/dump
 
 . shared/parse_options.sh || exit 1
 
@@ -29,15 +29,15 @@ log() {
 log "dl_dir: $dl_dir"
 
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
-  log "Stage 1: Prepare aishell3 manifest"
+  log "Stage 1: Prepare libritts manifest"
   mkdir -p data/manifests
-  if [ ! -e data/manifests/.aishell3.done ]; then
+  if [ ! -e data/manifests/.libritts.done ]; then
     python3 prepare_manifest.py \
         --dl_dir=${dl_dir} \
         --dump_dir=${dump_dir} \
         --output_dir="data/manifests"
 
-    touch data/manifests/.aishell3.done
+    touch data/manifests/.libritts.done
   fi
 fi
 
