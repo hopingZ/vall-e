@@ -42,42 +42,42 @@ if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
 fi
 
 if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
-  log "Stage 2: Tokenize aishell3"
+  log "Stage 2: Tokenize libritts"
   mkdir -p data/tokenized
-  if [ ! -e data/tokenized/.aishell3.tokenize.done ]; then
-    CUDA_VISIBLE_DEVICES=${gpus} python3 bin/tokenizer_for_aishell3.py \
+  if [ ! -e data/tokenized/.libritts.tokenize.done ]; then
+    CUDA_VISIBLE_DEVICES=${gpus} python3 bin/tokenizer_for_libritts.py \
         --src-dir "data/manifests" \
         --output-dir "data/tokenized" \
-        --prefix "aishell3"
+        --prefix "libritts"
     cp ${dump_dir}/phone_id_map.txt data/tokenized/unique_text_tokens.k2symbols
   fi
-  touch data/tokenized/.aishell3.tokenize.done
+  touch data/tokenized/.libritts.tokenize.done
 fi
 
 if [ $stage -le 3 ] && [ $stop_stage -ge 3 ]; then
-  log "Stage 3: Prepare aishell3 train/dev/test"
-  if [ ! -e data/tokenized/.aishell3.train.done ]; then
+  log "Stage 3: Prepare libritts train/dev/test"
+  if [ ! -e data/tokenized/.libritts.train.done ]; then
     # train
     lhotse copy \
-      data/tokenized/aishell3_cuts_train.jsonl.gz \
+      data/tokenized/libritts_cuts_train.jsonl.gz \
       data/tokenized/cuts_train.jsonl.gz
 
     # dev
     lhotse copy \
-      data/tokenized/aishell3_cuts_dev.jsonl.gz \
+      data/tokenized/libritts_cuts_dev.jsonl.gz \
       data/tokenized/cuts_dev.jsonl.gz
 
     # test
     lhotse copy \
-      data/tokenized/aishell3_cuts_test.jsonl.gz \
+      data/tokenized/libritts_cuts_test.jsonl.gz \
       data/tokenized/cuts_test.jsonl.gz
 
-    touch data/tokenized/.aishell3.train.done
+    touch data/tokenized/.libritts.train.done
   fi
 fi
 
 if [ $stage -le 4 ] && [ $stop_stage -ge 4 ]; then
-  log "Stage 4: Train aishell3"
+  log "Stage 4: Train libritts"
 
   # nano
   CUDA_VISIBLE_DEVICES=${gpus} python3 bin/trainer.py \
