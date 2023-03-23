@@ -5,11 +5,11 @@ set -eou pipefail
 # fix segmentation fault reported in https://github.com/k2-fsa/icefall/issues/674
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-gpus=0
+gpus=0,1
 
 nj=16
-stage=4
-stop_stage=4
+stage=-1
+stop_stage=3
 
 dl_dir=/data6/zhanghongbin/datasets/data_aishell3
 dump_dir=/data6/zhanghongbin/projects/PaddleSpeech/examples/aishell3/tts3/dump_not_cut-sil
@@ -74,25 +74,4 @@ if [ $stage -le 3 ] && [ $stop_stage -ge 3 ]; then
 
     touch data/tokenized/.aishell3.train.done
   fi
-fi
-
-if [ $stage -le 4 ] && [ $stop_stage -ge 4 ]; then
-  log "Stage 4: Train aishell3"
-
-  # nano
-  CUDA_VISIBLE_DEVICES=${gpus} python3 bin/trainer.py \
-    --decoder-dim 256 --nhead 4 --num-decoder-layers 6 \
-    --exp-dir exp/vallf_nano_debug \
-    --training-start-frame 60 \
-    --num-epochs 100 \
-    --base-lr 0.0005 \
-    --model-name "VALL-F" \
-    --max-duration 30 \
-    # --world-size 3
-    # --deepspeed --deepspeed_config configs/ds_zero2.config
-
-  # same as paper
-  # python3 bin/trainer.py \
-  #   --decoder-dim 1024 --nhead 16 --num-decoder-layers 12 \
-  #   --exp-dir exp/valle
 fi
