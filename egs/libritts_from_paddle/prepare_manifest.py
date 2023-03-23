@@ -74,7 +74,7 @@ def main():
                     duration=recordings[utt_id].duration,
                     channel=0,
                     text=phones,
-                    language="Mandarin",
+                    language="English",
                     speaker=speaker,
                     gender=None,
                     custom=customd,
@@ -85,8 +85,8 @@ def main():
         validate_recordings_and_supervisions(recordings, supervisions)
 
         if output_dir is not None:
-            supervisions.to_file(output_dir / f"aishell3_supervisions_{part}.jsonl.gz")
-            recordings.to_file(output_dir / f"aishell3_recordings_{part}.jsonl.gz")
+            supervisions.to_file(output_dir / f"libritts_supervisions_{part}.jsonl.gz")
+            recordings.to_file(output_dir / f"libritts_recordings_{part}.jsonl.gz")
 
 
 if __name__ == "__main__":
